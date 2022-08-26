@@ -28,7 +28,7 @@ OBJS		= ${SRCS:.c=.o}
 OBJS_B		= ${BONUS:.c=.o}
 NAME		= libft.a
 INCLUDES	= includes
-CC		= gcc
+CC			= gcc
 CFLAGS		= -Wall -Wextra -Werror
 RM			= rm -f
 

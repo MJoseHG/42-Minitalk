@@ -11,11 +11,6 @@
 /* ************************************************************************** */
 
 #include <libft.h>
-#include <math.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 #define ANSI_COLOR_RED "\x1b[31m"
 #define ANSI_COLOR_GREEN "\x1b[32m"
@@ -44,7 +39,8 @@ static void	receive_byte(int sign)
 	if (++cnt == 8)
 	{
 		cnt = 0;
-		ft_putchar_fd(byte, 1);
+		write(1, &byte, 1);
+		// ft_putchar_fd(byte, 1);
 		byte = 0;
 	}
 	else

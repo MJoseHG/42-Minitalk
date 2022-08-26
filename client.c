@@ -11,11 +11,6 @@
 /* ************************************************************************** */
 
 #include <libft.h>
-#include <math.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 #define ANSI_COLOR_RED "\x1b[31m"
 #define ANSI_COLOR_GREEN "\x1b[32m"
@@ -56,11 +51,13 @@ void	error_client(int pid, char *message)
 	if (!pid || !*message)
 	{
 		ft_putstr_color_fd(ANSI_COLOR_RED, "Client: Unexpected error.\n", 2);
+		ft_putstr_color_fd(ANSI_COLOR_YELLOW, "Null PID or NULL Message\n", 2);
 		exit(EXIT_FAILURE);
 	}
 	else if (pid == -1)
 	{
 		ft_putstr_color_fd(ANSI_COLOR_RED, "Client: Unexpected error.\n", 2);
+		ft_putstr_color_fd(ANSI_COLOR_YELLOW, "Wrong PID\n", 2);
 		exit(EXIT_FAILURE);
 	}
 }
