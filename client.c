@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <libft.h>
+#include <libft/libft.h>
 
 #define ANSI_COLOR_RED "\x1b[31m"
 #define ANSI_COLOR_GREEN "\x1b[32m"
@@ -26,20 +26,20 @@ void	ft_putstr_color_fd(char *color, char *s, int fd)
 
 static void	send_byte(int pid, char *message)
 {
-	int		cnt;
+	int		i;
 	char	byte;
 
 	while (*message)
 	{
-		cnt = 7;
+		i = 7;
 		byte = *message;
-		while (cnt >= 0)
+		while (i >= 0)
 		{
-			if (byte >> cnt & 1)
+			if (byte >> i & 1)
 				kill(pid, SIGUSR2);
 			else
 				kill(pid, SIGUSR1);
-			cnt--;
+			i--;
 			usleep(100);
 		}
 		message++;

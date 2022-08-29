@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <libft.h>
+#include <libft/libft.h>
 
 #define ANSI_COLOR_RED "\x1b[31m"
 #define ANSI_COLOR_GREEN "\x1b[32m"
@@ -26,21 +26,18 @@ void	ft_putstr_color_fd(char *color, char *s, int fd)
 
 static void	receive_byte(int sign)
 {
-	static int				cnt;
-	static unsigned char	byte;
+	static int				i = 0;
+	static unsigned char	byte = 0;
 	int						control;
 
-	cnt = 0;
-	byte = 0;
 	control = 0;
 	if (sign == SIGUSR2)
 		control = 1;
 	byte = byte | control;
-	if (++cnt == 8)
+	if (++i == 8)
 	{
-		cnt = 0;
-		write(1, &byte, 1);
-		// ft_putchar_fd(byte, 1);
+		i = 0;
+		ft_putchar_fd(byte, 1);
 		byte = 0;
 	}
 	else
