@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.c                                           :+:      :+:    :+:   */
+/*   server_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mahernan <mahernan@student.42malaga.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/08/10 11:10:46 by mahernan          #+#    #+#             */
-/*   Updated: 2022/08/10 11:10:50 by mahernan         ###   ########.fr       */
+/*   Created: 2022/09/05 12:59:21 by mahernan          #+#    #+#             */
+/*   Updated: 2022/09/05 12:59:25 by mahernan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,21 +24,29 @@ void	ft_putstr_color_fd(char *color, char *s, int fd)
 	ft_putstr_fd(ANSI_COLOR_RESET, fd);
 }
 
-static void	ft_receive_byte(int sign)
+static void	ft_receive_byte(int sign, siginfo_t *info, void *context)
 {
 	static int				i = 0;
 	static unsigned char	byte = 0;
-	int						control;
+	static pid_t			client_pid = 0;
 
-	control = 0;
+	(void)context;
+	if (!client_pid)
+		client_pid = info->si_pid;
 	if (sign == SIGUSR2)
-		control = 1;
-	byte = byte | control;
+		byte = byte | 1;
 	if (++i == 8)
 	{
 		i = 0;
+		if (byte == '\0')
+		{
+			kill(client_pid, SIGUSR2);
+			client_pid = 0;
+			return ;
+		}
 		ft_putchar_fd(byte, 1);
 		byte = 0;
+		kill(client_pid, SIGUSR1);
 	}
 	else
 		byte <<= 1;
@@ -46,11 +54,16 @@ static void	ft_receive_byte(int sign)
 
 int	main(void)
 {
+	struct sigaction	sa;
+
 	ft_putstr_color_fd(ANSI_COLOR_GREEN, "PID: ", 1);
 	ft_putnbr_fd(getpid(), 1);
 	ft_putstr_fd("\n", 1);
-	signal(SIGUSR1, &ft_receive_byte);
-	signal(SIGUSR2, &ft_receive_byte);
+	sa.sa_sigaction = ft_receive_byte;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_SIGINFO;
+	sigaction(SIGUSR1, &sa, NULL);
+	sigaction(SIGUSR2, &sa, NULL);
 	while (1)
 		pause();
 	return (0);

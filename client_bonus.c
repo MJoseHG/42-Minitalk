@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   client.c                                           :+:      :+:    :+:   */
+/*   client_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mahernan <mahernan@student.42malaga.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/08/10 11:10:57 by mahernan          #+#    #+#             */
-/*   Updated: 2022/08/10 11:11:00 by mahernan         ###   ########.fr       */
+/*   Created: 2022/09/05 12:58:50 by mahernan          #+#    #+#             */
+/*   Updated: 2022/09/05 12:59:09 by mahernan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,20 @@ void	ft_putstr_color_fd(char *color, char *s, int fd)
 	ft_putstr_fd(color, fd);
 	ft_putstr_fd(s, fd);
 	ft_putstr_fd(ANSI_COLOR_RESET, fd);
+}
+
+static void	ft_receive_signal(int sign)
+{
+	static int	i = 0;
+
+	if (sign == SIGUSR1)
+		i++;
+	if (sign == SIGUSR2)
+	{
+		ft_putstr_color_fd(ANSI_COLOR_GREEN, "Client: Received Signal.\n", 2);
+		ft_putnbr_fd(i, 1);
+		exit(EXIT_FAILURE);
+	}
 }
 
 static void	ft_send_byte(int pid, char *message)
@@ -43,6 +57,13 @@ static void	ft_send_byte(int pid, char *message)
 			usleep(100);
 		}
 		message++;
+	}
+	i = 8;
+	while (i > 0)
+	{
+		kill(pid, SIGUSR1);
+		i--;
+		usleep(100);
 	}
 }
 
@@ -78,6 +99,8 @@ int	main(int argc, char **argv)
 	pid = ft_atoi(argv[1]);
 	message = argv[2];
 	ft_error_client(pid, message);
+	signal(SIGUSR1, &ft_receive_signal);
+	signal(SIGUSR2, &ft_receive_signal);
 	ft_send_byte(pid, message);
 	return (0);
 }
