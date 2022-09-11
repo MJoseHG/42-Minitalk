@@ -48,10 +48,10 @@ static void	ft_receive_message(int sign, siginfo_t *info, void *context)
 		}
 		ft_putchar_fd(byte, 1);
 		byte = 0;
+		kill(client_pid, SIGUSR1);
 	}
 	else
 		byte <<= 1;
-	kill(client_pid, SIGUSR1);
 }
 
 int	main(void)

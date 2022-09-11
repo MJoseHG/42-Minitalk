@@ -32,6 +32,7 @@ static void	ft_receive_sign(int sign)
 		++i;
 	else
 	{
+		ft_putstr_color_fd(ANSI_COLOR_GREEN, "Bytes received: ", 1);
 		ft_putnbr_fd(i, 1);
 		ft_putchar_fd('\n', 1);
 		exit(0);
