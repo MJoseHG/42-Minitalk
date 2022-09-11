@@ -33,7 +33,6 @@ static void	ft_receive_message(int sign, siginfo_t *info, void *context)
 	(void)context;
 	if (!client_pid)
 		client_pid = info->si_pid;
-
 	if (sign == SIGUSR2)
 		byte = byte | 1;
 	if (++i == 8)

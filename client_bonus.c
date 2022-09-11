@@ -42,15 +42,15 @@ static void	ft_receive_sign(int sign)
 static void	ft_send_message(int pid, char *msg)
 {
 	int		i;
-	char	bit;
+	char	byte;
 
 	while (*msg)
 	{
 		i = 8;
-		bit = *msg;
+		byte = *msg;
 		while (i--)
 		{
-			if (bit >> i & 1)
+			if (byte >> i & 1)
 				kill(pid, SIGUSR2);
 			else
 				kill(pid, SIGUSR1);
