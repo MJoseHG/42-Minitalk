@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <libft/libft.h>
+#include "libft/libft.h"
 
 #define ANSI_COLOR_RED "\x1b[31m"
 #define ANSI_COLOR_GREEN "\x1b[32m"
@@ -24,31 +24,30 @@ void	ft_putstr_color_fd(char *color, char *s, int fd)
 	ft_putstr_fd(ANSI_COLOR_RESET, fd);
 }
 
-static void	ft_send_byte(int pid, char *message)
+static void	ft_send_message(int pid, char *msg)
 {
 	int		i;
-	char	byte;
+	char	bit;
 
-	while (*message)
+	while (*msg)
 	{
-		i = 7;
-		byte = *message;
-		while (i >= 0)
+		i = 8;
+		bit = *msg;
+		while (i--)
 		{
-			if (byte >> i & 1)
+			if (bit >> i & 1)
 				kill(pid, SIGUSR2);
 			else
 				kill(pid, SIGUSR1);
-			i--;
 			usleep(100);
 		}
-		message++;
+		msg++;
 	}
 }
 
-void	ft_error_client(int pid, char *message)
+void	ft_error_client(int pid, char *msg)
 {
-	if (!pid || !*message)
+	if (!pid || !*msg)
 	{
 		ft_putstr_color_fd(ANSI_COLOR_RED, "Client: Unexpected error.\n", 2);
 		ft_putstr_color_fd(ANSI_COLOR_YELLOW, "Null PID or NULL Message\n", 2);
@@ -65,19 +64,18 @@ void	ft_error_client(int pid, char *message)
 int	main(int argc, char **argv)
 {
 	int		pid;
-	char	*message;
+	char	*msg;
 
 	if (argc != 3)
 	{
-		ft_putstr_color_fd(ANSI_COLOR_RED,
-			"Client: Invalid arguments.\n", 2);
+		ft_putstr_color_fd(ANSI_COLOR_RED, "Client: Invalid arguments.\n", 2);
 		ft_putstr_color_fd(ANSI_COLOR_YELLOW,
 			"Correct format: [./client <PID> <STR>].\n", 2);
 		exit(EXIT_FAILURE);
 	}
 	pid = ft_atoi(argv[1]);
-	message = argv[2];
-	ft_error_client(pid, message);
-	ft_send_byte(pid, message);
+	msg = argv[2];
+	ft_error_client(pid, msg);
+	ft_send_message(pid, msg);
 	return (0);
 }

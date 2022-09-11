@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <libft/libft.h>
+#include "libft/libft.h"
 
 #define ANSI_COLOR_RED "\x1b[31m"
 #define ANSI_COLOR_GREEN "\x1b[32m"
@@ -24,20 +24,20 @@ void	ft_putstr_color_fd(char *color, char *s, int fd)
 	ft_putstr_fd(ANSI_COLOR_RESET, fd);
 }
 
-static void	ft_receive_byte(int sign)
+static void	ft_receive_message(int sign)
 {
 	static int				i = 0;
 	static unsigned char	byte = 0;
-	int						control;
+	int						check;
 
-	control = 0;
+	check = 0;
 	if (sign == SIGUSR2)
-		control = 1;
-	byte = byte | control;
+		check = 1;
+	byte = byte | check;
 	if (++i == 8)
 	{
 		i = 0;
-		ft_putchar_fd(byte, 1);
+		write(1, &byte, 1);
 		byte = 0;
 	}
 	else
@@ -49,8 +49,8 @@ int	main(void)
 	ft_putstr_color_fd(ANSI_COLOR_GREEN, "PID: ", 1);
 	ft_putnbr_fd(getpid(), 1);
 	ft_putstr_fd("\n", 1);
-	signal(SIGUSR1, &ft_receive_byte);
-	signal(SIGUSR2, &ft_receive_byte);
+	signal(SIGUSR1, &ft_receive_message);
+	signal(SIGUSR2, &ft_receive_message);
 	while (1)
 		pause();
 	return (0);

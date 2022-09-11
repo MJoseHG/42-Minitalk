@@ -10,28 +10,25 @@
 #                                                                              #
 # **************************************************************************** #
 
-# Library Name #
-NAME	=
-CLIENT	=	client
-SERVER	=	server
-BONUS_C	=	client_bonus
-BONUS_S	=	server_bonus
-
 # Libft Variables #
-LIBFT		=	./libft/libft.a
-LIBFT_DIR	=	./libft
+LIBFT	=	libft/libft.a
 
 # Mandatory Variables #
-SRC_C	=	client.c
 SRC_S	=	server.c
-BNS_C	=	client_bonus.c
+SRC_C	=	client.c
 BNS_S	=	server_bonus.c
-INC		=	-I. -I$(LIBFT_DIR)
+BNS_C	=	client_bonus.c
+
+# Transform to Objects #
+OBJ_S	=	$(SRC_S:.c=.o)
+OBJ_C	=	$(SRC_C:.c=.o)
+OBJ_BS	=	$(BNS_S:.c=.o)
+OBJ_BC	=	$(BNS_C:.c=.o)
 
 # Compiling Variables #
-CC			=	gcc
-CFLAG		=	-Wall -Wextra -Werror
-RM			=	rm -f
+CC		=	gcc
+CFLAG	=	-Wall -Wextra -Werror
+RM		=	rm -f
 
 # Colors #
 GREEN		=	\e[38;5;118m
@@ -41,48 +38,37 @@ _SUCCESS	=	[$(GREEN)SUCCESS$(RESET)]
 _INFO		=	[$(YELLOW)INFO$(RESET)]
 
 # Compiling #
-all: $(SERVER) $(CLIENT) $(BONUS_S) $(BONUS_C)
+all:		libft server client
 
-$(NAME): all
+libft:
+			@$(MAKE) -C ./libft all
 
-$(SERVER): $(LIBFT)
-	@ $(CC) $(CFLAG) $(SRC_S) $(LIBFT) $(INC) -o $(SERVER)
-	@printf "$(_SUCCESS) Server ready.\n"
+server:		$(OBJ_S) $(LIBFT)
+			@$(CC) $(CFLAG) $(OBJ_S) $(LIBFT) -o server
+			@printf "$(_SUCCESS) Server ready.\n"
 
-$(CLIENT): $(LIBFT)
-	@ $(CC) $(CFLAG) $(SRC_C) $(LIBFT) $(INC) -o $(CLIENT)
-	@printf "$(_SUCCESS) Client ready.\n"
+client:		$(OBJ_C) $(LIBFT)
+			@$(CC) $(CFLAG) $(OBJ_C) $(LIBFT) -o client
+			@printf "$(_SUCCESS) Client ready.\n"
 
-$(BONUS_S): $(LIBFT)
-	@ $(CC) $(CFLAG) $(BNS_S) $(LIBFT) $(INC) -o $(BONUS_S)
-	@printf "$(_SUCCESS) Server_Bonus ready.\n"
-
-$(BONUS_C): $(LIBFT)
-	@ $(CC) $(CFLAG) $(BNS_C) $(LIBFT) $(INC) -o $(BONUS_C)
-	@printf "$(_SUCCESS) Client_Bonus ready.\n"
-
-$(LIBFT):
-	@ $(MAKE) -C ./libft
+bonus:		libft $(OBJ_BS) $(OBJ_BC) $(LIBFT)
+			@$(CC) $(CFLAG) $(OBJ_BS) $(LIBFT) -o server_bonus
+			@printf "$(_SUCCESS) Server_Bonus ready.\n"
+			@$(CC) $(CFLAG) $(OBJ_BC) $(LIBFT) -o client_bonus
+			@printf "$(_SUCCESS) Client_Bonus ready.\n"
 
 clean:
-	@ $(RM) $(CLIENT) $(SERVER) $(BONUS_C) $(BONUS_S)
-	@printf "$(_INFO) Client removed.\n"
-	@printf "$(_INFO) Server removed.\n"
-	@printf "$(_INFO) Client_Bonus removed.\n"
-	@printf "$(_INFO) Server_Bonus removed.\n"
+			$(RM) $(OBJ_S) $(OBJ_C)
+			$(RM) $(OBJ_BS) $(OBJ_BC)
+			$(MAKE) -C ./libft clean
+			@printf "$(_INFO) Clean done.\n"
 
-fclean:
-	@ $(MAKE) fclean clean -C $(LIBFT_DIR)
-	@ $(RM) $(CLIENT) $(SERVER) $(BONUS_C) $(BONUS_S)
-	@printf "$(_INFO) Client removed.\n"
-	@printf "$(_INFO) Server removed.\n"
-	@printf "$(_INFO) Client_Bonus removed.\n"
-	@printf "$(_INFO) Server_Bonus removed.\n"
+fclean:		clean
+			$(RM) server client
+			$(RM) server_bonus client_bonus
+			$(MAKE) -C ./libft fclean
+			@printf "$(_INFO) FClean done.\n"
 
-re: fclean all
+re:			fclean all
 
-mandatory: $(CLIENT) $(SERVER) $(BNS_C) $(BNS_S)
-
-bonus: mandatory
-
-.PHONY: all clean fclean re mandatory bonus
+.PHONY:		all libft clean fclean re

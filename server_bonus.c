@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <libft/libft.h>
+#include "libft/libft.h"
 
 #define ANSI_COLOR_RED "\x1b[31m"
 #define ANSI_COLOR_GREEN "\x1b[32m"
@@ -24,7 +24,7 @@ void	ft_putstr_color_fd(char *color, char *s, int fd)
 	ft_putstr_fd(ANSI_COLOR_RESET, fd);
 }
 
-static void	ft_receive_byte(int sign, siginfo_t *info, void *context)
+static void	ft_receive_message(int sign, siginfo_t *info, void *context)
 {
 	static int				i = 0;
 	static unsigned char	byte = 0;
@@ -33,6 +33,7 @@ static void	ft_receive_byte(int sign, siginfo_t *info, void *context)
 	(void)context;
 	if (!client_pid)
 		client_pid = info->si_pid;
+
 	if (sign == SIGUSR2)
 		byte = byte | 1;
 	if (++i == 8)
@@ -40,30 +41,31 @@ static void	ft_receive_byte(int sign, siginfo_t *info, void *context)
 		i = 0;
 		if (byte == '\0')
 		{
+			ft_putchar_fd('\n', 1);
 			kill(client_pid, SIGUSR2);
 			client_pid = 0;
 			return ;
 		}
 		ft_putchar_fd(byte, 1);
 		byte = 0;
-		kill(client_pid, SIGUSR1);
 	}
 	else
 		byte <<= 1;
+	kill(client_pid, SIGUSR1);
 }
 
 int	main(void)
 {
-	struct sigaction	sa;
+	struct sigaction	sign;
 
 	ft_putstr_color_fd(ANSI_COLOR_GREEN, "PID: ", 1);
 	ft_putnbr_fd(getpid(), 1);
 	ft_putstr_fd("\n", 1);
-	sa.sa_sigaction = ft_receive_byte;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_SIGINFO;
-	sigaction(SIGUSR1, &sa, NULL);
-	sigaction(SIGUSR2, &sa, NULL);
+	sign.sa_sigaction = ft_receive_message;
+	sigemptyset(&sign.sa_mask);
+	sign.sa_flags = SA_SIGINFO;
+	sigaction(SIGUSR1, &sign, NULL);
+	sigaction(SIGUSR2, &sign, NULL);
 	while (1)
 		pause();
 	return (0);
